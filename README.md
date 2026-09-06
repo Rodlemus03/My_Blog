@@ -32,7 +32,8 @@ npm run dev
 
 ### View the Blog
 Open your browser and navigate to [CetaceansBlog](https://my-blog-one-beige-60.vercel.app/?#/login)  to view the blog.
-
+## Local Version
+If you want to run local, just change vite.config.js and api.js
 ## Technologies Used 🛠️
 - **React**: A JavaScript library for building user interfaces, enabling the creation of reusable UI components.
 - **Vite**: A modern web development build tool that offers a fast server start and HMR.
@@ -57,13 +58,3 @@ Embark on a journey through the vast oceans to explore the lives of cetaceans. E
 - **User**: User Page, with the name of the user, the role and the logout button.
 ```
 
-## Requisitos Cumplidos
-
-- **Código compatible con eslint javascript/standard (20 puntos)**: Se implemento correctamente, desde la api, hasta el blog y no tiene ningún error.
-- **React Suspense para el lazy loading (20 puntos)**: implementado correctamente en el manejo de `LoadingScreen`
-- **Router (10 puntos)**: implementado correctamente, en la carpeta de hooks adentro se encuentra el `HOC` y ahí dentro está el Admin y el Router creado.
-- **Api Hook (10 puntos)**: Se implementó correctamente en la carpeta de `src/Hooks` se encuentra el `useApi`
-- **Local token (10 puntos)**: Se implemento con la firma de `jwt` con su secret en el .env, en el login se hace la firma y se guarda en su hook the useAuth, este token dura 24 h. 
-- **Token de auticación en TODAS las request:(15 puntos)**: Se elabró correctamente, se puede ver en el hook del api las llamadas facilmente.
-- **UseForm  hook (10 puntos)**:Se implementó correctamente en la carpeta de `src/Hooks` se encuentra el `useForm`
-### Puntuación Total**: 95/95 + Subjetivo( 50 puntos)
