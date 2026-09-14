@@ -1,4 +1,5 @@
-const API_URL = 'https://cetaceans-blog-api.vercel.app';
+//const API_URL = 'https://cetaceans-blog-api.vercel.app';
+const API_URL = 'http://127.0.0.1:3000'; // Cambia esto a la URL de tu API
 
 export const fetchPosts = async () => {
     const response = await fetch(`${API_URL}/posts`);
@@ -39,7 +40,10 @@ export const createPost = async (authToken,title, information, author_id, author
     return response.json();
 };
 
-export const deletePostById = async (authToken,id) => {
+export const deletePostById = async (id) => {
+    // El token se persiste al iniciar sesión; leerlo aquí evita que el DELETE
+    // dependa de que el estado de React ya se haya hidratado desde localStorage.
+    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'DELETE',
         headers: {
@@ -47,12 +51,17 @@ export const deletePostById = async (authToken,id) => {
           }
     });
     if (!response.ok) {
-        throw new Error('Error al eliminar el post del API');
+        // Se conserva el status para que la interfaz distinga permisos de otros fallos.
+        const error = new Error('Error al eliminar el post del API');
+        error.status = response.status;
+        throw error;
     }
-    return response.json();
+    return response.status === 204 ? null : response.json();
 };
 
-export const updatePostById = async (authToken,id, title, information, family, diet, funfact) => {
+export const updatePostById = async (id, title, information, family, diet, funfact) => {
+    // PUT también está protegido: usa la misma fuente persistente que DELETE.
+    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'PUT',
         headers: {
@@ -63,14 +72,14 @@ export const updatePostById = async (authToken,id, title, information, family, d
         body: JSON.stringify({ title, information, family, diet, funfact })
     });
     if (!response.ok) {
-        throw new Error('Error al actualizar el post en el API');
+        const error = new Error('Error al actualizar el post en el API');
+        error.status = response.status;
+        throw error;
     }
     return response.json();
 };
 
 export const Login = async (login,username, password) => {
-     console.log("Patatas",login)
-     
     const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
@@ -78,17 +87,25 @@ export const Login = async (login,username, password) => {
         },
         body: JSON.stringify({ username, password_md5:password })
     });
-    const responseData = await response.json()
-    if (response.status === 200) {
+    const responseData = await response.json();
+    if (response.ok) {
         localStorage.setItem('token', responseData.token)
         login(responseData.token, {
           username: responseData.username,
           role: responseData.role,
           id: responseData.id,
         })
-      } else {
-        throw new Error('The user or the password is incorrect!');
-      }
+    } else {
+        // 401 significa credenciales inválidas; 429 es el límite de intentos.
+        const message = response.status === 401
+            ? 'Usuario o contraseña incorrectos.'
+            : response.status === 429
+                ? responseData.message || 'Demasiados intentos. Inténtalo de nuevo más tarde.'
+                : 'Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.';
+        const error = new Error(message);
+        error.status = response.status;
+        throw error;
+    }
     return response;
 };
 
