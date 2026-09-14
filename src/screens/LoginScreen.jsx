@@ -15,7 +15,9 @@ const Login = () => {
     const [errorMessage, setErrorMessage] = useState('')
     const { login } = useAuth()
 
-    const handleSubmitLogin = async () => {
+    const handleSubmitLogin = async (event) => {
+        event.preventDefault();
+        setErrorMessage('');
         try {
             const response = await userLogin(login,username, password);
             
@@ -25,7 +27,8 @@ const Login = () => {
                 return;
             } 
         } catch (error) {
-            setErrorMessage('Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+            // Login conserva el mensaje específico para respuestas 401 y 429.
+            setErrorMessage(error.message);
         }
     };
     if (loading) {

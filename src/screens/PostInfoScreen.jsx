@@ -1,10 +1,8 @@
-/* eslint-disable no-debugger */
 import { useState, useEffect } from 'react';
 import { useApi } from '../hooks/api/useApi';
 import useNavigate from '../hooks/HOC/useNavigate';
 import Swal from 'sweetalert2';
 import '../styles/Login.css';
-import { useAuth } from '../hooks/authProvider';
 import LoadingScreen from './LoadingScreen';
 
 
@@ -15,7 +13,6 @@ const Postdetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { navigate } = useNavigate();
-    const authToken = useAuth().authToken
     const { fetchPost, removePost, updatePost } = useApi();
     const [updatedPostData, setUpdatedPostData] = useState({
         title: '',
@@ -62,10 +59,11 @@ const Postdetail = () => {
         // Si el usuario confirma la eliminación
         if (result.isConfirmed) {
             try {
-                await removePost(authToken,postId);
+                await removePost(postId);
                 Swal.fire('Eliminado', 'El post ha sido eliminado correctamente', 'success');
             } catch (error) {
-                setError('Error al eliminar el post. Por favor, inténtalo de nuevo más tarde.');
+                // Los rechazos de autenticación/autorización se muestran al usuario.
+                Swal.fire('No se pudo eliminar', error.message, 'error');
             }
         }
     };
@@ -77,7 +75,7 @@ const Postdetail = () => {
 
     const handleUpdate = async () => {
         try {
-            await updatePost(authToken,postId, updatedPostData);
+            await updatePost(postId, updatedPostData);
             Swal.fire({
                 title: '¡Post Actualizado!',
                 text: 'El post se ha actualizado exitosamente.',
@@ -87,7 +85,8 @@ const Postdetail = () => {
                 navigate('/');
             });
         } catch (error) {
-            setError('Error al actualizar el post. Por favor, inténtalo de nuevo más tarde.');
+            // Muestra, por ejemplo, que un 403 corresponde a falta de permisos.
+            Swal.fire('No se pudo actualizar', error.message, 'error');
         }
     };
 
