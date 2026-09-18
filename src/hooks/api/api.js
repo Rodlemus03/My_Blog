@@ -120,5 +120,5 @@ export const register = async (username, password, email) => {
     if (!response.ok) {
         throw new Error('Error al crear el post en el API');
     }
-    return response;
+    return response.json();
 };
