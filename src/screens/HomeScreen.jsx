@@ -6,11 +6,10 @@ import { useAuth } from '../hooks/authProvider';
 
 const User = () => {
     const { navigate } = useNavigate();
-    const { user } = useAuth()
+    const { user, logout } = useAuth()
 
-    console.log(user)
-    const handleLogout = () => {
-      localStorage.clear(); 
+    const handleLogout = async () => {
+      await logout();
       Swal.fire({
           title: '¡Logout Exitoso!',
           text: 'Te has desconectado correctamente.',

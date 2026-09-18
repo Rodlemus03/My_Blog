@@ -23,13 +23,12 @@ export const fetchUserById = async (id) => {
     return response.json();
 };
 
-export const createPost = async (authToken,title, information, author_id, author_name, family, diet, funfact) => {
+export const createPost = async (title, information, author_id, author_name, family, diet, funfact) => {
     const response = await fetch(`${API_URL}/post`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
-             Authorization: `Bearer ${authToken}`
-
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, information, author_id, author_name, family, diet, funfact })
     });
@@ -39,12 +38,10 @@ export const createPost = async (authToken,title, information, author_id, author
     return response.json();
 };
 
-export const deletePostById = async (authToken,id) => {
+export const deletePostById = async (id) => {
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${authToken}`
-          }
+        credentials: 'include'
     });
     if (!response.ok) {
         throw new Error('Error al eliminar el post del API');
@@ -52,13 +49,12 @@ export const deletePostById = async (authToken,id) => {
     return response.json();
 };
 
-export const updatePostById = async (authToken,id, title, information, family, diet, funfact) => {
+export const updatePostById = async (id, title, information, family, diet, funfact) => {
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`
-
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, information, family, diet, funfact })
     });
@@ -69,19 +65,17 @@ export const updatePostById = async (authToken,id, title, information, family, d
 };
 
 export const Login = async (login,username, password) => {
-     console.log("Patatas",login)
-     
     const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password_md5:password })
+        body: JSON.stringify({ username, password })
     });
     const responseData = await response.json()
     if (response.status === 200) {
-        localStorage.setItem('token', responseData.token)
-        login(responseData.token, {
+        login({
           username: responseData.username,
           role: responseData.role,
           id: responseData.id,
@@ -95,10 +89,11 @@ export const Login = async (login,username, password) => {
 export const register = async (username, password, email) => {
     const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, email, password_md5: password }),
+        body: JSON.stringify({ username, email, password }),
     });
     if (!response.ok) {
         throw new Error('Error al crear el post en el API');

@@ -1,8 +1,7 @@
-/* eslint-disable react/prop-types */
 import '../styles/Postitem.css'; 
 import Card from 'react-bootstrap/Card';
+import PropTypes from 'prop-types';
 
-// eslint-disable-next-line react/prop-types
 const PostItem = ({ post }) => {
 
     const styles = {
@@ -41,5 +40,15 @@ const PostItem = ({ post }) => {
     );
 };
 
+PostItem.propTypes = {
+    post: PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        family: PropTypes.string.isRequired,
+        information: PropTypes.string.isRequired,
+        created_at: PropTypes.string.isRequired,
+        updated_at: PropTypes.string.isRequired,
+        author_name: PropTypes.string.isRequired,
+    }).isRequired,
+};
 
 export default PostItem;

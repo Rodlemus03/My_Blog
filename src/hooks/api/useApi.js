@@ -45,11 +45,11 @@ export const useApi = () => {
         }
     };
 
-    const addPost = async (authToken,author_id,author_name,postData) => {
+    const addPost = async (author_id,author_name,postData) => {
         setLoading(true);
         try {
             const { title, information, family, diet, funfact } = postData; 
-            const responseData = await createPost(authToken,title, information,author_id, author_name , family, diet, funfact);
+            const responseData = await createPost(title, information,author_id, author_name , family, diet, funfact);
             setData([...data, responseData.data]);
         } catch (error) {
             setError('Error al crear el post. Por favor, inténtalo de nuevo más tarde.');
@@ -58,11 +58,11 @@ export const useApi = () => {
         }
     };
 
-    const removePost = async (authToken,postId) => {
+    const removePost = async (postId) => {
         setLoading(true);
         try {
-            await deletePostById(authToken,postId);
-            setData(data.filter(post => post.id !== postId)); // Eliminar el post de la lista actual
+            await deletePostById(postId);
+            setData(data.filter(post => post.id !== postId));
         } catch (error) {
             setError('Error al eliminar el post. Por favor, inténtalo de nuevo más tarde.');
         } finally {
@@ -70,12 +70,12 @@ export const useApi = () => {
         }
     };
 
-    const updatePost = async (authToken,postId, updatedData) => {
+    const updatePost = async (postId, updatedData) => {
         setLoading(true);
         try {
             const {  title, information, family, diet, funfact} = updatedData;
-            const responseData = await updatePostById(authToken,postId,  title, information, family, diet, funfact);
-            setData(data.map(post => (post.id === postId ? responseData : post))); // Actualizar el post en la lista actual
+            const responseData = await updatePostById(postId,  title, information, family, diet, funfact);
+            setData(data.map(post => (post.id === postId ? responseData : post)));
         } catch (error) {
             setError('Error al actualizar el post. Por favor, inténtalo de nuevo más tarde.');
         } finally {

@@ -2,37 +2,44 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 const AuthContext = createContext(null)
+const API_URL = 'https://cetaceans-blog-api.vercel.app'
 
 export const AuthProvider = ({ children }) => {
-  const [authData, setAuthData] = useState({ token: null, user: null })
+  const [authData, setAuthData] = useState({ user: null, loading: true })
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const userJson = localStorage.getItem('user')
-    try {
-      const user = userJson ? JSON.parse(userJson) : null
-      setAuthData({ token, user })
-    } catch (error) {
-      console.error('Failed to parse user data:', error)
+    const loadSession = async () => {
+      try {
+        const response = await fetch(`${API_URL}/me`, { credentials: 'include' })
+        if (!response.ok) {
+          setAuthData({ user: null, loading: false })
+          return
+        }
+        const data = await response.json()
+        setAuthData({ user: data.user, loading: false })
+      } catch {
+        setAuthData({ user: null, loading: false })
+      }
     }
+    loadSession()
   }, [])
 
-  const login = (token, user) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
-    setAuthData({ token, user })
-    console.log(user)
+  const login = (user) => {
+    setAuthData({ user, loading: false })
   }
 
-  const logout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    setAuthData({ token: null, user: null })
+  const logout = async () => {
+    await fetch(`${API_URL}/logout`, {
+      method: 'POST',
+      credentials: 'include'
+    })
+    setAuthData({ user: null, loading: false })
   }
 
   const authContextValue = {
-    authToken: authData.token,
+    authToken: authData.user ? 'cookie' : null,
     user: authData.user,
+    loading: authData.loading,
     login,
     logout
   }
