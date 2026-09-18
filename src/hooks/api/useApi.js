@@ -58,26 +58,42 @@ export const useApi = () => {
         }
     };
 
-    const removePost = async (authToken,postId) => {
+    const removePost = async (postId) => {
         setLoading(true);
         try {
-            await deletePostById(authToken,postId);
+            await deletePostById(postId);
             setData(data.filter(post => post.id !== postId)); // Eliminar el post de la lista actual
         } catch (error) {
-            setError('Error al eliminar el post. Por favor, inténtalo de nuevo más tarde.');
+            const message = error.status === 401
+                ? 'Tu sesión no es válida o expiró. Inicia sesión nuevamente.'
+                : error.status === 403
+                    ? 'No tienes permiso para eliminar este post.'
+                    : 'Error al eliminar el post. Por favor, inténtalo de nuevo más tarde.';
+
+            setError(message);
+            // Propagar el rechazo evita que la pantalla muestre un falso éxito.
+            throw new Error(message);
         } finally {
             setLoading(false);
         }
     };
 
-    const updatePost = async (authToken,postId, updatedData) => {
+    const updatePost = async (postId, updatedData) => {
         setLoading(true);
         try {
             const {  title, information, family, diet, funfact} = updatedData;
-            const responseData = await updatePostById(authToken,postId,  title, information, family, diet, funfact);
+            const responseData = await updatePostById(postId, title, information, family, diet, funfact);
             setData(data.map(post => (post.id === postId ? responseData : post))); // Actualizar el post en la lista actual
         } catch (error) {
-            setError('Error al actualizar el post. Por favor, inténtalo de nuevo más tarde.');
+            const message = error.status === 401
+                ? 'Tu sesión no es válida o expiró. Inicia sesión nuevamente.'
+                : error.status === 403
+                    ? 'No tienes permiso para modificar este post.'
+                    : 'Error al actualizar el post. Por favor, inténtalo de nuevo más tarde.';
+
+            setError(message);
+            // Impide que el componente muestre éxito cuando PUT fue rechazado.
+            throw new Error(message);
         } finally {
             setLoading(false);
         }
@@ -89,8 +105,12 @@ export const useApi = () => {
             const response = await Login(login,username, password);
             return response;
         } catch (error) {
-            console.log(error)
-            setError('Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.');
+            const message = error.status
+                ? error.message
+                : 'Error al iniciar sesión. Por favor, inténtalo de nuevo más tarde.';
+            setError(message);
+            // La pantalla debe distinguir credenciales incorrectas (401) del límite (429).
+            throw new Error(message);
         } finally {
             setLoading(false);
         }
