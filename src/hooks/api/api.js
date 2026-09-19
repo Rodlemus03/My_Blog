@@ -24,13 +24,12 @@ export const fetchUserById = async (id) => {
     return response.json();
 };
 
-export const createPost = async (authToken,title, information, author_id, author_name, family, diet, funfact) => {
+export const createPost = async (title, information, author_id, author_name, family, diet, funfact) => {
     const response = await fetch(`${API_URL}/post`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
-             Authorization: `Bearer ${authToken}`
-
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, information, author_id, author_name, family, diet, funfact })
     });
@@ -41,14 +40,9 @@ export const createPost = async (authToken,title, information, author_id, author
 };
 
 export const deletePostById = async (id) => {
-    // El token se persiste al iniciar sesión; leerlo aquí evita que el DELETE
-    // dependa de que el estado de React ya se haya hidratado desde localStorage.
-    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'DELETE',
-        headers: {
-            Authorization: `Bearer ${authToken}`
-          }
+        credentials: 'include'
     });
     if (!response.ok) {
         // Se conserva el status para que la interfaz distinga permisos de otros fallos.
@@ -60,21 +54,16 @@ export const deletePostById = async (id) => {
 };
 
 export const updatePostById = async (id, title, information, family, diet, funfact) => {
-    // PUT también está protegido: usa la misma fuente persistente que DELETE.
-    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`
-
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, information, family, diet, funfact })
     });
     if (!response.ok) {
-        const error = new Error('Error al actualizar el post en el API');
-        error.status = response.status;
-        throw error;
+        throw new Error('Error al actualizar el post en el API');
     }
     return response.json();
 };
@@ -82,15 +71,15 @@ export const updatePostById = async (id, title, information, family, diet, funfa
 export const Login = async (login,username, password) => {
     const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password_md5:password })
+        body: JSON.stringify({ username, password })
     });
-    const responseData = await response.json();
-    if (response.ok) {
-        localStorage.setItem('token', responseData.token)
-        login(responseData.token, {
+    const responseData = await response.json()
+    if (response.status === 200) {
+        login({
           username: responseData.username,
           role: responseData.role,
           id: responseData.id,
@@ -112,10 +101,11 @@ export const Login = async (login,username, password) => {
 export const register = async (username, password, email) => {
     const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, email, password_md5: password }),
+        body: JSON.stringify({ username, email, password }),
     });
     if (!response.ok) {
         throw new Error('Error al crear el post en el API');

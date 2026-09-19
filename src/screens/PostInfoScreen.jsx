@@ -56,14 +56,12 @@ const Postdetail = () => {
             confirmButtonText: 'Sí, eliminarlo'
         });
     
-        // Si el usuario confirma la eliminación
         if (result.isConfirmed) {
             try {
                 await removePost(postId);
                 Swal.fire('Eliminado', 'El post ha sido eliminado correctamente', 'success');
             } catch (error) {
-                // Los rechazos de autenticación/autorización se muestran al usuario.
-                Swal.fire('No se pudo eliminar', error.message, 'error');
+                setError('Error al eliminar el post. Por favor, inténtalo de nuevo más tarde.');
             }
         }
     };

@@ -45,11 +45,11 @@ export const useApi = () => {
         }
     };
 
-    const addPost = async (authToken,author_id,author_name,postData) => {
+    const addPost = async (author_id,author_name,postData) => {
         setLoading(true);
         try {
             const { title, information, family, diet, funfact } = postData; 
-            const responseData = await createPost(authToken,title, information,author_id, author_name , family, diet, funfact);
+            const responseData = await createPost(title, information,author_id, author_name , family, diet, funfact);
             setData([...data, responseData.data]);
         } catch (error) {
             setError('Error al crear el post. Por favor, inténtalo de nuevo más tarde.');
