@@ -40,9 +40,15 @@ export const createPost = async (title, information, author_id, author_name, fam
 };
 
 export const deletePostById = async (id) => {
+    // El token se persiste al iniciar sesión; leerlo aquí evita que el DELETE
+    // dependa de que el estado de React ya se haya hidratado desde localStorage.
+    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'DELETE',
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+            Authorization: `Bearer ${authToken}`
+          }
     });
     if (!response.ok) {
         // Se conserva el status para que la interfaz distinga permisos de otros fallos.
@@ -54,16 +60,22 @@ export const deletePostById = async (id) => {
 };
 
 export const updatePostById = async (id, title, information, family, diet, funfact) => {
+    // PUT también está protegido: usa la misma fuente persistente que DELETE.
+    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`
+
         },
         body: JSON.stringify({ title, information, family, diet, funfact })
     });
     if (!response.ok) {
-        throw new Error('Error al actualizar el post en el API');
+        const error = new Error('Error al actualizar el post en el API');
+        error.status = response.status;
+        throw error;
     }
     return response.json();
 };
@@ -75,11 +87,12 @@ export const Login = async (login,username, password) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password_md5:password })
     });
-    const responseData = await response.json()
-    if (response.status === 200) {
-        login({
+    const responseData = await response.json();
+    if (response.ok) {
+        localStorage.setItem('token', responseData.token)
+        login(responseData.token, {
           username: responseData.username,
           role: responseData.role,
           id: responseData.id,
