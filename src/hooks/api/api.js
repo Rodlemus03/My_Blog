@@ -40,15 +40,9 @@ export const createPost = async (title, information, author_id, author_name, fam
 };
 
 export const deletePostById = async (id) => {
-    // El token se persiste al iniciar sesión; leerlo aquí evita que el DELETE
-    // dependa de que el estado de React ya se haya hidratado desde localStorage.
-    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'DELETE',
-        credentials: 'include',
-        headers: {
-            Authorization: `Bearer ${authToken}`
-          }
+        credentials: 'include'
     });
     if (!response.ok) {
         // Se conserva el status para que la interfaz distinga permisos de otros fallos.
@@ -60,15 +54,11 @@ export const deletePostById = async (id) => {
 };
 
 export const updatePostById = async (id, title, information, family, diet, funfact) => {
-    // PUT también está protegido: usa la misma fuente persistente que DELETE.
-    const authToken = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/post/${id}`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`
-
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ title, information, family, diet, funfact })
     });
@@ -87,12 +77,11 @@ export const Login = async (login,username, password) => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password_md5:password })
+        body: JSON.stringify({ username, password })
     });
     const responseData = await response.json();
     if (response.ok) {
-        localStorage.setItem('token', responseData.token)
-        login(responseData.token, {
+        login({
           username: responseData.username,
           role: responseData.role,
           id: responseData.id,

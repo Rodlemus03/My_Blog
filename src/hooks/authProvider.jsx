@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 const AuthContext = createContext(null)
-const API_URL = 'https://cetaceans-blog-api.vercel.app'
+// const API_URL = 'https://cetaceans-blog-api.vercel.app'
+const API_URL = 'http://127.0.0.1:3000' // Cambia esto a la URL de tu API
 
 export const AuthProvider = ({ children }) => {
   const [authData, setAuthData] = useState({ user: null, loading: true })

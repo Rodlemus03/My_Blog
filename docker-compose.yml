@@ -1,0 +1,14 @@
+services:
+  vite-dev:
+    build: .
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules   # keep container's node_modules, don't overwrite from host
+    environment:
+      # Needed on Windows/WSL2 bind mounts, otherwise file-change events
+      # from the host often don't reach the container and HMR won't fire
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    tty: true
