@@ -20,7 +20,7 @@ const Register = () => {
 
         try {
             const response = await addUser(username, password,email);
-            if (response.ok) {
+            if (response?.status === 'success') {
                 Swal.fire({
                     title: '¡Usuario ingresado!',
                     text: 'Ya puedes hacer login en el blog.',

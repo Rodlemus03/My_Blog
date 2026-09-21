@@ -83,7 +83,8 @@ const Postdetail = () => {
                 navigate('/');
             });
         } catch (error) {
-            setError('Error al actualizar el post. Por favor, inténtalo de nuevo más tarde.');
+            // Muestra, por ejemplo, que un 403 corresponde a falta de permisos.
+            Swal.fire('No se pudo actualizar', error.message, 'error');
         }
     };
 
